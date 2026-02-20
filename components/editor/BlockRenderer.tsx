@@ -94,7 +94,7 @@ const BlockNode = ({ node }: BlockNodeProps) => {
       )
 
     case "heading":
-      const HeadingTag = `h${node.attrs?.level || 2}` as keyof JSX.IntrinsicElements
+      const HeadingTag = `h${node.attrs?.level || 2}` as keyof React.JSX.IntrinsicElements
       const headingClasses: Record<number, string> = {
         1: "text-4xl font-bold mt-10 mb-4 text-gray-900",
         2: "text-3xl font-bold mt-8 mb-3 text-gray-900",

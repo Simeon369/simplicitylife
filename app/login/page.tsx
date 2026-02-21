@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useAuthStore, type AuthState } from "@/store/authStore";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -135,15 +136,7 @@ export default function Login() {
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-3">
-                  <motion.span
-                    className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  />
+                  <Loader size="sm" className="text-white" />
                   Signing In...
                 </span>
               ) : (

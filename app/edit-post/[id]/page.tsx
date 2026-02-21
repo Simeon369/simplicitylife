@@ -10,11 +10,11 @@ import {
   Eye,
   Save,
   Send,
-  Loader2,
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
+import Loader, { FullPageLoader } from "@/components/Loader";
 import SimpleEditor from "@/components/editor/SimpleEditor";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { useEditorStore } from "@/store/editorStore";
@@ -247,27 +247,7 @@ export default function EditPost() {
   if (isLoading) {
     return (
       <RequireAuth>
-        <div className="min-h-screen bg-white">
-        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="h-8 bg-gray-200 rounded-lg w-20 animate-pulse"></div>
-              <div className="flex gap-3">
-                <div className="h-9 bg-gray-200 rounded-lg w-24 animate-pulse"></div>
-                <div className="h-9 bg-gray-200 rounded-lg w-28 animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="space-y-8">
-            <div className="h-64 bg-gray-200 rounded-xl animate-pulse"></div>
-            <div className="h-10 bg-gray-200 rounded-full w-32 animate-pulse"></div>
-            <div className="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
-            <div className="min-h-[400px] bg-gray-100 rounded-lg animate-pulse"></div>
-          </div>
-        </div>
-      </div>
+        <FullPageLoader />
       </RequireAuth>
     );
   }
@@ -345,7 +325,7 @@ export default function EditPost() {
                 >
                   {autoSaveStatus === "saving" ? (
                     <>
-                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <Loader size="xs" />
                       Saving...
                     </>
                   ) : (
@@ -365,7 +345,7 @@ export default function EditPost() {
                 whileTap={{ scale: 0.98 }}
               >
                 {isSaving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader size="sm" />
                 ) : (
                   <Save className="w-4 h-4" />
                 )}
@@ -380,7 +360,7 @@ export default function EditPost() {
                 whileTap={{ scale: 0.98 }}
               >
                 {isSaving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader size="sm" />
                 ) : (
                   <Send className="w-4 h-4" />
                 )}

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore, type AuthState } from "@/store/authStore";
+import { FullPageLoader } from "@/components/Loader";
 
 export default function RequireAuth({
   children,
@@ -24,11 +25,7 @@ export default function RequireAuth({
   }, [loading, isAuthenticated, isAdmin, router, pathname]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
-      </div>
-    );
+    return <FullPageLoader />;
   }
 
   if (!isAuthenticated || !isAdmin) {

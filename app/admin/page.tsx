@@ -12,10 +12,10 @@ import {
   Edit,
   Trash2,
   Calendar,
-  Loader2,
   AlertCircle,
 } from "lucide-react";
 import Nav from "@/components/Nav";
+import Loader from "@/components/Loader";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { authFetch } from "@/lib/authFetch";
 import type { ApiResponse, BlogPost } from "@/types";
@@ -185,24 +185,24 @@ export default function Admin() {
       <div className="min-h-screen bg-gray-50">
         <Nav />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-[425px]:px-3 max-[425px]:py-5">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-8 max-[425px]:mb-5"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 max-[425px]:gap-3">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 max-[425px]:text-xl max-[425px]:mb-1">
                 Dashboard
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 max-[425px]:text-sm">
                 Manage your blog posts and content
               </p>
             </div>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" />
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2 max-[425px]:px-3 max-[425px]:py-2 max-[425px]:text-xs">
+                <AlertCircle className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
                 {error}
                 <button
                   onClick={() => setError(null)}
@@ -219,7 +219,7 @@ export default function Admin() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-[425px]:gap-3 max-[425px]:mb-5"
         >
           {[
             {
@@ -252,15 +252,15 @@ export default function Admin() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 + idx * 0.05 }}
-              className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100"
+              className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 max-[425px]:p-3 max-[425px]:rounded-lg"
             >
-              <div className="flex items-center justify-between mb-2">
-                <stat.Icon className="w-6 h-6 text-gray-600" />
+              <div className="flex items-center justify-between mb-2 max-[425px]:mb-1">
+                <stat.Icon className="w-6 h-6 text-gray-600 max-[425px]:w-5 max-[425px]:h-5" />
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 max-[425px]:text-lg">
                 {stat.value}
               </p>
-              <p className="text-xs sm:text-sm text-gray-500">{stat.label}</p>
+              <p className="text-xs sm:text-sm text-gray-500 max-[425px]:text-[10px]">{stat.label}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -269,15 +269,15 @@ export default function Admin() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-6"
+          className="mb-6 max-[425px]:mb-4"
         >
           <Link href="/create-post">
             <motion.button
-              className="w-full sm:w-auto bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 max-[425px]:px-4 max-[425px]:py-2 max-[425px]:text-sm"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 max-[425px]:w-4 max-[425px]:h-4" />
               Create New Post
             </motion.button>
           </Link>
@@ -289,7 +289,7 @@ export default function Admin() {
           transition={{ delay: 0.3 }}
           className="mb-6"
         >
-          <div className="flex gap-2 border-b border-gray-200 overflow-x-auto">
+          <div className="flex gap-2 border-b border-gray-200 overflow-x-auto max-[425px]:gap-1">
             {[
               { id: "all", label: "All Posts" },
               { id: "published", label: "Published" },
@@ -298,7 +298,7 @@ export default function Admin() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 font-medium text-sm whitespace-nowrap transition-colors ${
+                className={`px-4 py-2 font-medium text-sm whitespace-nowrap transition-colors max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-xs ${
                   activeTab === tab.id
                     ? "text-black border-b-2 border-black"
                     : "text-gray-500 hover:text-gray-700"
@@ -317,33 +317,33 @@ export default function Admin() {
           className="space-y-4"
         >
           {loading ? (
-            <div className="bg-white rounded-xl p-8 sm:p-12 text-center shadow-sm border border-gray-100">
-              <Loader2 className="w-16 h-16 mx-auto mb-4 text-blue-600 animate-spin" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="bg-white rounded-xl p-8 sm:p-12 text-center shadow-sm border border-gray-100 max-[425px]:p-6">
+              <Loader size="lg" className="mx-auto mb-4 max-[425px]:w-12 max-[425px]:h-12 max-[425px]:mb-3" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2 max-[425px]:text-base">
                 Loading posts...
               </h3>
-              <p className="text-gray-500">
+              <p className="text-gray-500 max-[425px]:text-sm">
                 Please wait while we fetch your content
               </p>
             </div>
           ) : filteredPosts.length === 0 ? (
-            <div className="bg-white rounded-xl p-8 sm:p-12 text-center shadow-sm border border-gray-100">
-              <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="bg-white rounded-xl p-8 sm:p-12 text-center shadow-sm border border-gray-100 max-[425px]:p-6">
+              <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400 max-[425px]:w-12 max-[425px]:h-12 max-[425px]:mb-3" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2 max-[425px]:text-base">
                 {activeTab === "all" ? "No posts yet" : `No ${activeTab} posts`}
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 mb-6 max-[425px]:text-sm max-[425px]:mb-4">
                 {activeTab === "all"
                   ? "Start creating content to share with your audience"
                   : `You don't have any ${activeTab} posts yet`}
               </p>
               <Link href="/create-post">
                 <motion.button
-                  className="bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors inline-flex items-center gap-2"
+                  className="bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors inline-flex items-center gap-2 max-[425px]:px-4 max-[425px]:py-2 max-[425px]:text-sm"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="w-5 h-5 max-[425px]:w-4 max-[425px]:h-4" />
                   Create New Post
                 </motion.button>
               </Link>
@@ -357,16 +357,16 @@ export default function Admin() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: 0.1 * idx }}
-                  className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                  className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow max-[425px]:p-3 max-[425px]:rounded-lg"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 max-[425px]:gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 flex-1">
+                      <div className="flex items-start gap-3 mb-2 max-[425px]:gap-2 max-[425px]:mb-1.5">
+                        <h3 className="text-lg font-semibold text-gray-900 flex-1 max-[425px]:text-base">
                           {post.title}
                         </h3>
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                          className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap max-[425px]:px-2 max-[425px]:py-0.5 max-[425px]:text-[10px] ${
                             post.status === "published"
                               ? "bg-green-100 text-green-700"
                               : "bg-yellow-100 text-yellow-700"
@@ -375,13 +375,13 @@ export default function Admin() {
                           {post.status === "published" ? "Published" : "Draft"}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2 max-[425px]:text-xs max-[425px]:mb-2">
                         {post.excerpt ||
                           getExcerpt(
                             typeof post.body === "string" ? post.body : "",
                           )}
                       </p>
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 max-[425px]:gap-2 max-[425px]:text-[10px]">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {formatDate(post.createdAt)}
@@ -405,17 +405,17 @@ export default function Admin() {
                       </div>
                     </div>
 
-                    <div className="flex sm:flex-col gap-2 sm:gap-2">
+                    <div className="flex sm:flex-col gap-2 sm:gap-2 max-[425px]:gap-1.5">
                       <Link
                         href={`/edit-post/${post._id || post.id}`}
                         className="flex-1 sm:flex-none"
                       >
                         <motion.button
-                          className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                          className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-xs"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
                           <span className="hidden sm:inline">Edit</span>
                         </motion.button>
                       </Link>
@@ -424,21 +424,21 @@ export default function Admin() {
                         className="flex-1 sm:flex-none"
                       >
                         <motion.button
-                          className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                          className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-xs"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
                           <span className="hidden sm:inline">View</span>
                         </motion.button>
                       </Link>
                       <motion.button
                         onClick={() => handleDelete(post)}
-                        className="flex-1 sm:flex-none px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 sm:flex-none px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-2 max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-xs"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
                         <span className="hidden sm:inline">Delete</span>
                       </motion.button>
                     </div>
@@ -464,25 +464,25 @@ export default function Admin() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl"
+              className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl max-[425px]:p-4 max-[425px]:rounded-lg max-[425px]:mx-3"
             >
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-gray-900 mb-2 max-[425px]:text-lg max-[425px]:mb-1.5">
                 Delete Post?
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 max-[425px]:text-sm max-[425px]:mb-4">
                 Are you sure you want to delete "{selectedPost?.title}"? This
                 action cannot be undone.
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-3 max-[425px]:gap-2">
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors"
+                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-sm"
                 >
                   Delete
                 </button>

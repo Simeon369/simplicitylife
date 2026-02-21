@@ -20,7 +20,7 @@ const NavLink = ({
   return (
     <Link href={href} onClick={onClick}>
       <motion.div
-        className="relative px-3 py-2 text-gray-700 font-medium transition-colors"
+        className="relative px-3 py-2 text-gray-700 font-medium transition-colors max-[425px]:px-2 max-[425px]:py-1.5 max-[425px]:text-sm"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         whileHover={{ y: -2 }}
@@ -53,7 +53,7 @@ const MobileNavLink = ({
   return (
     <Link href={href} onClick={onClick}>
       <motion.div
-        className="block px-6 py-4 text-gray-700 font-medium text-lg hover:bg-gray-100 transition-colors"
+        className="block px-6 py-4 text-gray-700 font-medium text-lg hover:bg-gray-100 transition-colors max-[425px]:px-4 max-[425px]:py-3 max-[425px]:text-base"
         whileTap={{ scale: 0.98 }}
       >
         {children}
@@ -145,10 +145,10 @@ const Nav = () => {
         animate={{ y: 0 }}
         transition={{ type: "spring" as const, stiffness: 100, damping: 20 }}
       >
-        <div className="flex justify-between items-center px-8 py-5 max-w-7xl mx-auto">
+        <div className="flex justify-between items-center px-4 py-5 max-w-7xl mx-auto max-[425px]:px-3 max-[425px]:py-3">
           <Link href="/">
             <motion.div
-              className="text-3xl font-bold text-black cursor-pointer"
+              className="text-2xl font-bold text-black cursor-pointer max-[425px]:text-lg"
               style={{ fontFamily: "var(--font-logo)" }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -180,7 +180,7 @@ const Nav = () => {
 
             {isAuthenticated && isAdmin && (
               <motion.div variants={itemVariants}>
-                <NavLink href="/admin">Admin Dashboard</NavLink>
+                <NavLink href="/admin">Admin</NavLink>
               </motion.div>
             )}
 
@@ -188,7 +188,7 @@ const Nav = () => {
               <motion.div variants={itemVariants}>
                 <motion.button
                   onClick={logout}
-                  className="px-5 py-2 bg-red-500 text-white ml-2 font-medium rounded-lg shadow-md"
+                  className="px-5 py-2 bg-red-500 text-white ml-2 font-medium rounded-lg shadow-md max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-sm max-[425px]:ml-1"
                   whileHover={{
                     scale: 1.05,
                     backgroundColor: "#dc2626",
@@ -204,7 +204,7 @@ const Nav = () => {
                 <motion.div variants={itemVariants}>
                   <Link href="/login">
                     <motion.div
-                      className="px-4 py-2 text-gray-700 mr-2 font-medium rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                      className="px-4 py-2 text-gray-700 mr-2 font-medium rounded-lg hover:bg-gray-100 transition-colors cursor-pointer max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-sm max-[425px]:mr-1"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -216,7 +216,7 @@ const Nav = () => {
                 <motion.div variants={itemVariants}>
                   <Link href="/register">
                     <motion.div
-                      className="px-5 py-2 bg-black text-white mr-2 font-medium rounded-lg shadow-md cursor-pointer"
+                      className="px-5 py-2 bg-black text-white mr-2 font-medium rounded-lg shadow-md cursor-pointer max-[425px]:px-3 max-[425px]:py-1.5 max-[425px]:text-sm max-[425px]:mr-1"
                       whileHover={{
                         scale: 1.05,
                         boxShadow: "0 10px 25px -5px rgba(99, 102, 241, 0.5)",
@@ -232,20 +232,20 @@ const Nav = () => {
           </motion.div>
 
           <motion.button
-            className="md:hidden flex flex-col gap-1.5 p-2"
+            className="md:hidden flex flex-col gap-1.5 p-2 max-[425px]:gap-1 max-[425px]:p-1.5"
             onClick={toggleMenu}
             whileTap={{ scale: 0.9 }}
           >
             <motion.span
-              className="w-6 h-0.5 bg-gray-700 block"
+              className="w-6 h-0.5 bg-gray-700 block max-[425px]:w-5"
               animate={isMenu ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
             />
             <motion.span
-              className="w-6 h-0.5 bg-gray-700 block"
+              className="w-6 h-0.5 bg-gray-700 block max-[425px]:w-5"
               animate={isMenu ? { opacity: 0 } : { opacity: 1 }}
             />
             <motion.span
-              className="w-6 h-0.5 bg-gray-700 block"
+              className="w-6 h-0.5 bg-gray-700 block max-[425px]:w-5"
               animate={isMenu ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
             />
           </motion.button>
@@ -262,7 +262,7 @@ const Nav = () => {
             exit="exit"
           >
             <motion.div
-              className="pt-24 pb-8"
+              className="pt-24 pb-8 max-[425px]:pt-20 max-[425px]:pb-6"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -286,14 +286,14 @@ const Nav = () => {
               </motion.div>
 
               <motion.div
-                className="border-t border-gray-200 mt-4 pt-4"
+                className="border-t border-gray-200 mt-4 pt-4 max-[425px]:mt-3 max-[425px]:pt-3"
                 variants={mobileItemVariants}
               >
                 {!isAuthenticated ? (
-                  <div className="px-6 space-y-3">
+                  <div className="px-6 flex flex-col gap-4 max-[425px]:px-4 max-[425px]:gap-3">
                     <Link href="/login" onClick={closeMenu}>
                       <motion.div
-                        className="block w-full px-4 py-3 text-center text-gray-700 font-medium rounded-lg border-2 border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer"
+                        className="block w-full px-4 py-3 text-center text-gray-700 font-medium rounded-lg border-2 border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer max-[425px]:py-2.5 max-[425px]:text-sm"
                         whileTap={{ scale: 0.98 }}
                       >
                         Login
@@ -302,7 +302,7 @@ const Nav = () => {
 
                     <Link href="/register" onClick={closeMenu}>
                       <motion.div
-                        className="block w-full px-4 py-3 text-center text-white font-medium rounded-lg shadow-md bg-black cursor-pointer"
+                        className="block w-full px-4 py-3 text-center text-white font-medium rounded-lg shadow-md bg-black cursor-pointer max-[425px]:py-2.5 max-[425px]:text-sm"
                         whileTap={{ scale: 0.98 }}
                       >
                         Register
@@ -310,16 +310,16 @@ const Nav = () => {
                     </Link>
                   </div>
                 ) : (
-                  <div className="px-6 space-y-3">
+                  <div className="px-6 flex flex-col gap-4 max-[425px]:px-4 max-[425px]:gap-3">
                     {isAdmin && (
                       <MobileNavLink href="/admin" onClick={closeMenu}>
-                        Admin Dashboard
+                        Admin
                       </MobileNavLink>
                     )}
 
                     <motion.button
                       onClick={handleLogout}
-                      className="block w-full px-4 py-3 text-center bg-red-500 text-white font-medium rounded-lg shadow-md"
+                      className="block w-full px-4 py-3 text-center bg-red-500 text-white font-medium rounded-lg shadow-md max-[425px]:py-2.5 max-[425px]:text-sm"
                       whileTap={{ scale: 0.98 }}
                     >
                       Logout

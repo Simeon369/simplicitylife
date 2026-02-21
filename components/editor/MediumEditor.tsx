@@ -14,6 +14,7 @@ import Dropcursor from "@tiptap/extension-dropcursor"
 import { common, createLowlight } from "lowlight"
 
 import BubbleToolbar from "./BubbleToolbar"
+import Loader from "@/components/Loader"
 import { uploadImage } from "@/services/api"
 import "./editor-styles.css" // Add this import
 
@@ -216,7 +217,7 @@ const MediumEditor = ({
   if (!isMounted) {
     return (
       <div className="min-h-[400px] flex items-center justify-center border border-gray-200 rounded-lg">
-        <div className="animate-pulse text-gray-400">Loading editor...</div>
+        <Loader size="lg" />
       </div>
     )
   }
@@ -224,7 +225,7 @@ const MediumEditor = ({
   if (!editor) {
     return (
       <div className="min-h-[400px] flex items-center justify-center border border-gray-200 rounded-lg">
-        <div className="animate-pulse text-gray-400">Loading editor...</div>
+        <Loader size="lg" />
       </div>
     )
   }

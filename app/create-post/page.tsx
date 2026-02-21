@@ -10,11 +10,11 @@ import {
   Eye,
   Save,
   Send,
-  Loader2,
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
+import Loader from "@/components/Loader";
 import SimpleEditor from "@/components/editor/SimpleEditor";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { useEditorStore } from "@/store/editorStore";
@@ -247,7 +247,7 @@ export default function CreatePost() {
                 >
                   {autoSaveStatus === "saving" ? (
                     <>
-                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <Loader size="xs" />
                       Saving...
                     </>
                   ) : (
@@ -267,7 +267,7 @@ export default function CreatePost() {
                 whileTap={{ scale: 0.98 }}
               >
                 {isSaving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader size="sm" />
                 ) : (
                   <Save className="w-4 h-4" />
                 )}
@@ -282,7 +282,7 @@ export default function CreatePost() {
                 whileTap={{ scale: 0.98 }}
               >
                 {isSaving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader size="sm" />
                 ) : (
                   <Send className="w-4 h-4" />
                 )}

@@ -64,6 +64,30 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@media (max-width: 425px) {
+  html {
+    font-size: 14px;
+  }
+  body {
+    line-height: 1.5;
+  }
+  .form-input {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    border-radius: 8px;
+  }
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 8px;
+  }
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;

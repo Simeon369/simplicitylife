@@ -143,7 +143,7 @@ const Nav = () => {
         className="bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm relative z-50"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        transition={{ type: "spring" as const, stiffness: 100, damping: 20 }}
       >
         <div className="flex justify-between items-center px-8 py-5 max-w-7xl mx-auto">
           <Link href="/">

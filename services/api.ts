@@ -82,8 +82,8 @@ export const blogAPI = {
     return {
       success: true,
       data: transformedData,
-      total: count,
-      totalPages: Math.ceil(count! / limit),
+      total: count ?? undefined,
+      totalPages: Math.ceil((count ?? 0) / limit),
       currentPage: page,
     };
   },

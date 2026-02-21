@@ -83,10 +83,8 @@ const BubbleToolbar = ({ editor }: BubbleToolbarProps) => {
   return (
     <BubbleMenu
       editor={editor}
-      tippyOptions={{
-        duration: 150,
+      options={{
         placement: "top",
-        hideOnClick: false,
       }}
       className="bubble-toolbar flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg shadow-lg p-1"
     >

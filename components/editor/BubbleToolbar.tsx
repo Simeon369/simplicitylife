@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react"
 import { Editor } from "@tiptap/core"
-import { BubbleMenu } from "@tiptap/extension-bubble-menu"
+import { BubbleMenu } from "@tiptap/react/menus"
 import {
   Bold,
   Italic,

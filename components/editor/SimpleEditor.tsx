@@ -84,21 +84,50 @@ const SimpleEditor: React.FC<SimpleEditorProps> = ({
     });
 
     if (!res.ok) {
-      throw new Error("Image upload failed");
+      const errorText = await res.text().catch(() => "");
+      throw new Error(errorText || "Image upload failed");
     }
 
     const data = await res.json();
+    if (!data?.url) {
+      throw new Error("Image upload failed");
+    }
     return data.url as string;
   };
 
   const handleImagePick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Basic validation to avoid bad uploads
+    const validTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!validTypes.includes(file.type)) {
+      window.alert(
+        "Please upload a valid image file (JPEG, PNG, GIF, WebP).",
+      );
+      return;
+    }
+
+    // 5MB size limit (same as header image)
+    if (file.size > 5 * 1024 * 1024) {
+      window.alert("Image size should be less than 5MB.");
+      return;
+    }
+
     try {
       const url = await uploadImage(file);
       editor.chain().focus().setImage({ src: url }).run();
     } catch (err) {
       console.error(err);
+      window.alert(
+        "Image upload failed. Please check your connection and try again.",
+      );
     }
   };
 
@@ -112,7 +141,15 @@ const SimpleEditor: React.FC<SimpleEditorProps> = ({
       return;
     }
 
-    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+    // Normalize URL to ensure it has a protocol
+    const normalizedUrl = url.match(/^https?:\/\//i) ? url : `https://${url}`;
+
+    editor
+      .chain()
+      .focus()
+      .extendMarkRange("link")
+      .setLink({ href: normalizedUrl })
+      .run();
   };
 
   return (
@@ -185,7 +222,7 @@ const SimpleEditor: React.FC<SimpleEditorProps> = ({
           />
         </label>
       </div>
-      <div className="px-4 py-3">
+      <div className="px-4 py-3 simple-editor-content">
         <EditorContent editor={editor} />
       </div>
     </div>

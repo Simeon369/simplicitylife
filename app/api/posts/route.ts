@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     let filteredPostIds: string[] | null = null;
 
     if (tagSlug) {
-      const { data: tagRows, error: tagError } = await supabase
+      const { data: tagRows, error: tagError } = await supabaseClient
         .from("tags")
         .select("id")
         .eq("name", tagSlug)
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(emptyResponse);
       }
 
-      const { data: postTags, error: postTagsError } = await supabase
+      const { data: postTags, error: postTagsError } = await supabaseClient
         .from("post_tags")
         .select("post_id")
         .eq("tag_id", tag.id);

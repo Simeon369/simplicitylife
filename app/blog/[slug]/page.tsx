@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { getPostBySlug, getRelatedPostsByTag } from "@/lib/blogServer";
@@ -7,9 +8,84 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import BlockRenderer from "@/components/editor/BlockRenderer";
 import { blocksToPlainText, isTiptapJSON } from "@/components/editor/utils/migratePlainText";
+import ShareButtons from "@/components/ShareButtons";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata(
+  { params }: BlogPostPageProps,
+): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPostBySlug(slug);
+
+  if (!post) {
+    return {
+      title: "Post not found – SIMPLICITY",
+    };
+  }
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://simplicityblog.com";
+  const url = `${siteUrl}/blog/${post.slug}`;
+
+  // Derive description from excerpt or body content
+  let description = post.excerpt;
+  if (!description) {
+    let plainText = "";
+    if (typeof post.body === "string") {
+      if (isTiptapJSON(post.body)) {
+        try {
+          const parsed = JSON.parse(post.body);
+          plainText = blocksToPlainText(parsed);
+        } catch {
+          plainText = post.body;
+        }
+      } else {
+        plainText = post.body;
+      }
+    } else {
+      plainText = blocksToPlainText(post.body);
+    }
+    description = plainText.slice(0, 200);
+    if (plainText.length > 200) {
+      description += "...";
+    }
+  }
+
+  const imageUrl =
+    post.headerImage || `${siteUrl}/default-og.png`;
+
+  return {
+    title: `${post.title} – SIMPLICITY`,
+    description,
+    openGraph: {
+      type: "article",
+      url,
+      title: post.title,
+      description,
+      siteName: "SIMPLICITY",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      locale: "en_US",
+      publishedTime: post.createdAt,
+      modifiedTime: post.updatedAt,
+      tags: post.tags?.map((t) => t.label || t.name),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      images: [imageUrl],
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
@@ -28,6 +104,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         3,
       )
     : [];
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://simplicityblog.com";
+  const postUrl = `${siteUrl}/blog/${post.slug}`;
 
   const getReadingTime = (body: string | any) => {
     if (!body) return 1;
@@ -85,23 +165,26 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-6 text-gray-500 text-sm mb-8 max-[425px]:gap-4 max-[425px]:mb-6 max-[425px]:text-xs">
-            <span className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
-              {new Date(post.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
-              {getReadingTime(post.body)} min read
-            </span>
-            <span className="flex items-center gap-2">
-              <Eye className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
-              {(post.views || 0).toLocaleString()} views
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 max-[425px]:mb-6">
+            <div className="flex flex-wrap items-center gap-6 text-gray-500 text-sm max-[425px]:gap-4 max-[425px]:text-xs">
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
+                {new Date(post.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+              <span className="flex items-center gap-2">
+                <Clock className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
+                {getReadingTime(post.body)} min read
+              </span>
+              <span className="flex items-center gap-2">
+                <Eye className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
+                {(post.views || 0).toLocaleString()} views
+              </span>
+            </div>
+            <ShareButtons url={postUrl} title={post.title} />
           </div>
 
           {post.headerImage && (

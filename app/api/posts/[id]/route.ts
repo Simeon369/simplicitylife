@@ -23,15 +23,21 @@ const mapPostRowToBlogPost = (row: any, tags: Tag[] = []): BlogPost => {
 
 // GET /api/posts/[id] - fetch a single post by id
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const supabase = await getServerSupabase();
   const { id: postId } = await params;
 
   try {
+    // Use admin client for authenticated admin requests so drafts are visible.
+    // For non-admin/public usage, fall back to the regular server client (with RLS).
+    const auth = await getAuthFromRequest(request);
+    const supabaseClient =
+      auth && auth.role === "admin"
+        ? getSupabaseAdmin()
+        : await getServerSupabase();
 
-    const { data: post, error } = await supabase
+    const { data: post, error } = await supabaseClient
       .from("posts")
       .select("*")
       .eq("id", postId)
@@ -45,13 +51,22 @@ export async function GET(
       return NextResponse.json(response, { status: 404 });
     }
 
-    // Increment views (best-effort, ignore errors)
-    void supabase
-      .from("posts")
-      .update({ views: (post.views ?? 0) + 1 })
-      .eq("id", postId);
+    // Increment views for non-admin/public reads only (best-effort, ignore errors)
+    if (!auth || auth.role !== "admin") {
+      void (async () => {
+        try {
+          const publicClient = await getServerSupabase();
+          await publicClient
+            .from("posts")
+            .update({ views: (post.views ?? 0) + 1 })
+            .eq("id", postId);
+        } catch {
+          // ignore view increment errors
+        }
+      })();
+    }
 
-    const { data: postTagsWithTag } = await supabase
+    const { data: postTagsWithTag } = await supabaseClient
       .from("post_tags")
       .select("post_id, tags ( id, name, label )")
       .eq("post_id", postId);

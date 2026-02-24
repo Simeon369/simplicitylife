@@ -34,7 +34,6 @@ const mapPostRowToBlogPost = (row: any, tags: Tag[] = []): BlogPost => {
 // GET /api/posts
 // List posts with optional filters and pagination.
 export async function GET(request: NextRequest) {
-  const supabase = await getServerSupabase();
   const { searchParams } = new URL(request.url);
 
   const page = Number(searchParams.get("page") ?? "1");
@@ -48,19 +47,27 @@ export async function GET(request: NextRequest) {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
+  // Choose Supabase client based on requested status:
+  // - For admin-only views (status=all or draft), use the admin client so drafts are visible.
+  // - For public/published views, use the standard server client with RLS.
+  let supabaseClient;
+
   if (rawStatus === "all" || rawStatus === "draft") {
     const auth = await getAuthFromRequest(request);
     if (!auth || auth.role !== "admin") {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
+    supabaseClient = getSupabaseAdmin();
+  } else {
+    supabaseClient = await getServerSupabase();
   }
 
   try {
     // Base query for posts
-    let postsQuery = supabase
+    let postsQuery = supabaseClient
       .from("posts")
       .select("*", { count: "exact" })
       .order("created_at", { ascending: false })
@@ -142,7 +149,7 @@ export async function GET(request: NextRequest) {
     let tagsByPostId: Record<string, Tag[]> = {};
 
     if (postIds.length > 0) {
-      const { data: postTagsWithTag, error: tagsError } = await supabase
+      const { data: postTagsWithTag, error: tagsError } = await supabaseClient
         .from("post_tags")
         .select("post_id, tags ( id, name, label )")
         .in("post_id", postIds);

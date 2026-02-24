@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Share2, Copy, MessageCircle, Link as LinkIcon } from "lucide-react";
+import { Share2, Copy, Link as LinkIcon } from "lucide-react";
 
 interface ShareButtonsProps {
   url: string;
@@ -35,11 +35,6 @@ export default function ShareButtons({ url, title }: ShareButtonsProps) {
     }
   };
 
-  const encodedUrl = encodeURIComponent(url);
-  const encodedTitle = encodeURIComponent(title);
-
-  const whatsappHref = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
-
   const canUseNativeShare =
     typeof navigator !== "undefined" && typeof navigator.share === "function";
 
@@ -71,18 +66,6 @@ export default function ShareButtons({ url, title }: ShareButtonsProps) {
             {copied ? "Copied" : "Copy link"}
           </span>
         </motion.button>
-
-        <motion.a
-          href={whatsappHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 bg-white text-gray-800 hover:bg-gray-50 transition-colors"
-        >
-          <MessageCircle className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">WhatsApp</span>
-        </motion.a>
       </div>
 
       <span className="hidden sm:flex items-center gap-1 text-gray-400">

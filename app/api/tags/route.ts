@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSupabase } from "@/lib/supabase/server";
+import { getServerSupabase, getSupabaseAdmin } from "@/lib/supabase/server";
 import { getAuthFromRequest } from "@/lib/auth";
 import type { ApiResponse, Tag } from "@/types";
 
@@ -42,8 +42,6 @@ export async function GET() {
 
 // POST /api/tags - create a new tag (admin only)
 export async function POST(request: NextRequest) {
-  const supabase = await getServerSupabase();
-
   try {
     const { name, label } = await request.json();
 
@@ -66,7 +64,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 403 });
     }
 
-    const { data: existing, error: existingError } = await supabase
+    // Use admin client so RLS on tags doesn't block legitimate admin writes
+    const admin = getSupabaseAdmin();
+
+    const { data: existing, error: existingError } = await admin
       .from("tags")
       .select("id")
       .eq("name", normalizedName)
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 409 });
     }
 
-    const { data: inserted, error: insertError } = await supabase
+    const { data: inserted, error: insertError } = await admin
       .from("tags")
       .insert({
         name: normalizedName,

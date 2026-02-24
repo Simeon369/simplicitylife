@@ -43,6 +43,8 @@ export default function CreatePost() {
 
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [showTagDropdown, setShowTagDropdown] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+  const [isCreatingTag, setIsCreatingTag] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -112,6 +114,32 @@ export default function CreatePost() {
     setAutoSaveStatus("saving");
     setTimeout(() => setAutoSaveStatus("saved"), 500);
   }, []);
+
+  const handleCreateTag = async () => {
+    const trimmed = newTagName.trim();
+    if (!trimmed) return;
+    setIsCreatingTag(true);
+    try {
+      const res = await authFetch("/api/tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed, label: trimmed }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success || !json.data) {
+        throw new Error(json.error || "Failed to create tag");
+      }
+      const created: Tag = json.data;
+      setAvailableTags((prev) => [...prev, created]);
+      setTags([...tags, created]);
+      setNewTagName("");
+    } catch (e: any) {
+      console.error("Error creating tag", e);
+      setError(e.message || "Failed to create tag");
+    } finally {
+      setIsCreatingTag(false);
+    }
+  };
 
   const handleSubmit = async (status: "draft" | "published") => {
     setStatus(status);
@@ -366,8 +394,28 @@ export default function CreatePost() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="absolute z-10 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-2 space-y-1"
+                className="absolute z-10 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-2 space-y-2"
               >
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    value={newTagName}
+                    onChange={(e) => setNewTagName(e.target.value)}
+                    placeholder="New tag name"
+                    className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateTag}
+                    disabled={isCreatingTag || !newTagName.trim()}
+                    className="px-2 py-1 text-xs font-medium rounded bg-black text-white disabled:opacity-50"
+                  >
+                    {isCreatingTag ? "..." : "Add"}
+                  </button>
+                </div>
+                {availableTags.length > 0 && (
+                  <div className="h-px bg-gray-100" />
+                )}
                 {availableTags.map((tag: Tag) => {
                   const isSelected = !!tags.find(
                     (selected: Tag) => selected.id === tag.id,

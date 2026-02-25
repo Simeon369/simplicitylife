@@ -1,20 +1,15 @@
 import Nav from "@/components/Nav"
 import Footer from "@/components/Footer"
 import BlogCard from "@/components/BlogCard"
-import { blogAPI } from "@/services/api"
+import { getRecentPosts } from "@/lib/blogServer"
 import { ArrowRight, BookOpen, Feather } from "lucide-react"
 import Link from "next/link"
 
 export const revalidate = 0
+export const dynamic = "force-dynamic"
 
 export default async function Home() {
-  // Fetch recent posts on server
-  const recentPostsResponse = await blogAPI.getRecentPosts(6)
-  const recentPosts = recentPostsResponse.data || []
-  
-  // Fetch stats on server
-  const statsResponse = await blogAPI.getStats()
-  const stats = statsResponse.data || { totalPosts: 0, totalViews: 0 }
+  const recentPosts = await getRecentPosts(6)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

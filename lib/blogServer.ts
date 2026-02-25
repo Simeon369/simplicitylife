@@ -332,6 +332,63 @@ export async function getAllTags(): Promise<Tag[]> {
 }
 
 /**
+ * Server-only: fetch recent published posts with view counts.
+ */
+export async function getRecentPosts(limit = 6): Promise<BlogPost[]> {
+  const supabase = await getServerSupabase();
+
+  const { data: postRows, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error || !postRows) {
+    console.error("getRecentPosts error:", error);
+    return [];
+  }
+
+  const postIds = postRows.map((p: any) => p.id);
+  let tagsByPostId: Record<string, Tag[]> = {};
+  let viewCounts: Record<string, number> = {};
+
+  if (postIds.length > 0) {
+    const [tagsResult, viewCountsResult] = await Promise.all([
+      supabase
+        .from("post_tags")
+        .select("post_id, tags ( id, name, label )")
+        .in("post_id", postIds),
+      getViewCountsForPosts(postIds),
+    ]);
+
+    if (tagsResult.data) {
+      tagsByPostId = tagsResult.data.reduce(
+        (acc: Record<string, Tag[]>, row: any) => {
+          const t = row.tags;
+          if (!t) return acc;
+          const tag: Tag = {
+            id: t.id,
+            name: t.name,
+            label: t.label ?? undefined,
+          };
+          if (!acc[row.post_id]) acc[row.post_id] = [];
+          acc[row.post_id].push(tag);
+          return acc;
+        },
+        {},
+      );
+    }
+
+    viewCounts = viewCountsResult;
+  }
+
+  return postRows.map((row: any) =>
+    mapPostRowToBlogPost(row, tagsByPostId[row.id] || [], viewCounts[row.id]),
+  );
+}
+
+/**
  * Server-only: fetch view count for a post from the post_views table.
  */
 export async function getPostViewCount(postId: string): Promise<number> {

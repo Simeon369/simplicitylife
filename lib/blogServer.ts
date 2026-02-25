@@ -1,7 +1,11 @@
-import { getServerSupabase } from "@/lib/supabase/server";
+import { getServerSupabase, getSupabaseAdmin } from "@/lib/supabase/server";
 import type { BlogPost, Tag } from "@/types";
 
-const mapPostRowToBlogPost = (row: any, tags: Tag[] = []): BlogPost => ({
+const mapPostRowToBlogPost = (
+  row: any,
+  tags: Tag[] = [],
+  viewCount?: number
+): BlogPost => ({
   _id: row.id,
   id: row.id,
   title: row.title,
@@ -10,12 +14,32 @@ const mapPostRowToBlogPost = (row: any, tags: Tag[] = []): BlogPost => ({
   excerpt: row.excerpt,
   status: row.status,
   headerImage: row.header_image,
-  views: row.views ?? 0,
+  views: viewCount ?? row.views ?? 0,
   authorId: row.author_id,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
   tags,
 });
+
+async function getViewCountsForPosts(
+  postIds: string[]
+): Promise<Record<string, number>> {
+  if (postIds.length === 0) return {};
+
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("post_views")
+    .select("post_id")
+    .in("post_id", postIds);
+
+  if (error || !data) return {};
+
+  const counts: Record<string, number> = {};
+  for (const row of data) {
+    counts[row.post_id] = (counts[row.post_id] || 0) + 1;
+  }
+  return counts;
+}
 
 export interface GetPostsParams {
   page?: number;
@@ -100,15 +124,19 @@ export async function getPostsForBlog(params: GetPostsParams = {}): Promise<GetP
 
   const postIds = (postRows || []).map((p: any) => p.id);
   let tagsByPostId: Record<string, Tag[]> = {};
+  let viewCounts: Record<string, number> = {};
 
   if (postIds.length > 0) {
-    const { data: postTagsWithTag, error: tagsError } = await supabase
-      .from("post_tags")
-      .select("post_id, tags ( id, name, label )")
-      .in("post_id", postIds);
+    const [tagsResult, viewCountsResult] = await Promise.all([
+      supabase
+        .from("post_tags")
+        .select("post_id, tags ( id, name, label )")
+        .in("post_id", postIds),
+      getViewCountsForPosts(postIds),
+    ]);
 
-    if (!tagsError && postTagsWithTag) {
-      tagsByPostId = postTagsWithTag.reduce(
+    if (!tagsResult.error && tagsResult.data) {
+      tagsByPostId = tagsResult.data.reduce(
         (acc: Record<string, Tag[]>, row: any) => {
           const t = row.tags;
           if (!t) return acc;
@@ -124,10 +152,12 @@ export async function getPostsForBlog(params: GetPostsParams = {}): Promise<GetP
         {},
       );
     }
+
+    viewCounts = viewCountsResult;
   }
 
   const posts: BlogPost[] = (postRows || []).map((row: any) =>
-    mapPostRowToBlogPost(row, tagsByPostId[row.id] || []),
+    mapPostRowToBlogPost(row, tagsByPostId[row.id] || [], viewCounts[row.id]),
   );
 
   const total = count ?? posts.length;
@@ -203,13 +233,18 @@ export async function getRelatedPostsByTag(
 
   if (!postRows?.length) return [];
 
-  const { data: postTagsWithTag } = await supabase
-    .from("post_tags")
-    .select("post_id, tags ( id, name, label )")
-    .in("post_id", postRows.map((p: any) => p.id));
+  const relatedPostIds = postRows.map((p: any) => p.id);
+
+  const [tagsResult, viewCounts] = await Promise.all([
+    supabase
+      .from("post_tags")
+      .select("post_id, tags ( id, name, label )")
+      .in("post_id", relatedPostIds),
+    getViewCountsForPosts(relatedPostIds),
+  ]);
 
   const tagsByPostId: Record<string, Tag[]> = {};
-  (postTagsWithTag || []).forEach((row: any) => {
+  (tagsResult.data || []).forEach((row: any) => {
     const t = row.tags;
     if (!t) return;
     const tag: Tag = { id: t.id, name: t.name, label: t.label ?? undefined };
@@ -218,7 +253,63 @@ export async function getRelatedPostsByTag(
   });
 
   return postRows.map((row: any) =>
-    mapPostRowToBlogPost(row, tagsByPostId[row.id] || []),
+    mapPostRowToBlogPost(row, tagsByPostId[row.id] || [], viewCounts[row.id]),
+  );
+}
+
+/**
+ * Server-only: fetch ALL published posts (for client-side filtering).
+ */
+export async function getAllPublishedPosts(): Promise<BlogPost[]> {
+  const supabase = await getServerSupabase();
+
+  const { data: postRows, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "published")
+    .order("created_at", { ascending: false });
+
+  if (error || !postRows) {
+    console.error("getAllPublishedPosts error:", error);
+    return [];
+  }
+
+  const postIds = postRows.map((p: any) => p.id);
+  let tagsByPostId: Record<string, Tag[]> = {};
+  let viewCounts: Record<string, number> = {};
+
+  if (postIds.length > 0) {
+    const [tagsResult, viewCountsResult] = await Promise.all([
+      supabase
+        .from("post_tags")
+        .select("post_id, tags ( id, name, label )")
+        .in("post_id", postIds),
+      getViewCountsForPosts(postIds),
+    ]);
+
+    if (tagsResult.data) {
+      tagsByPostId = tagsResult.data.reduce(
+        (acc: Record<string, Tag[]>, row: any) => {
+          const t = row.tags;
+          if (!t) return acc;
+          const tag: Tag = {
+            id: t.id,
+            name: t.name,
+            label: t.label ?? undefined,
+          };
+          if (!acc[row.post_id]) acc[row.post_id] = [];
+          acc[row.post_id].push(tag);
+          return acc;
+        },
+        {},
+      );
+    }
+
+    viewCounts = viewCountsResult;
+  }
+
+  return postRows.map((row: any) =>
+    mapPostRowToBlogPost(row, tagsByPostId[row.id] || [], viewCounts[row.id]),
   );
 }
 
@@ -238,4 +329,21 @@ export async function getAllTags(): Promise<Tag[]> {
     name: row.name,
     label: row.label ?? undefined,
   }));
+}
+
+/**
+ * Server-only: fetch view count for a post from the post_views table.
+ */
+export async function getPostViewCount(postId: string): Promise<number> {
+  const supabase = getSupabaseAdmin();
+  const { count, error } = await supabase
+    .from("post_views")
+    .select("*", { count: "exact", head: true })
+    .eq("post_id", postId);
+
+  if (error) {
+    console.error("getPostViewCount error:", error);
+    return 0;
+  }
+  return count ?? 0;
 }

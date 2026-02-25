@@ -171,3 +171,58 @@ for all
 using (public.is_admin(auth.uid()))
 with check (public.is_admin(auth.uid()));
 
+------------------
+-- POST_VIEWS   --
+------------------
+-- Tracks unique views per post using a visitor fingerprint.
+-- The fingerprint is generated client-side (UUID stored in localStorage).
+-- This prevents duplicate counts from the same visitor while
+-- still allowing anonymous view tracking.
+
+create table if not exists public.post_views (
+  id uuid primary key default uuid_generate_v4(),
+  post_id uuid not null references public.posts (id) on delete cascade,
+  visitor_id text not null,
+  viewed_at timestamptz not null default now()
+);
+
+-- Prevent duplicate views from same visitor on same post
+create unique index if not exists idx_post_views_unique
+on public.post_views (post_id, visitor_id);
+
+-- Index for counting views per post
+create index if not exists idx_post_views_post_id
+on public.post_views (post_id);
+
+alter table public.post_views enable row level security;
+
+-- Anyone can insert views (anonymous tracking)
+-- Using 'true' allows both authenticated and anonymous users
+create policy if not exists "Anyone can insert post_views"
+on public.post_views
+for insert
+to anon, authenticated
+with check (true);
+
+-- Only admin can read/delete views (for analytics)
+create policy if not exists "Admin can read post_views"
+on public.post_views
+for select
+using (public.is_admin(auth.uid()));
+
+create policy if not exists "Admin can delete post_views"
+on public.post_views
+for delete
+using (public.is_admin(auth.uid()));
+
+-- Function to get view count for a post (from post_views table)
+create or replace function public.get_post_view_count(p_post_id uuid)
+returns bigint
+language sql
+stable
+as $$
+  select count(*)::bigint
+  from public.post_views
+  where post_id = p_post_id;
+$$;
+

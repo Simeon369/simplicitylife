@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { getPostBySlug, getRelatedPostsByTag } from "@/lib/blogServer";
+import { getPostBySlug, getRelatedPostsByTag, getPostViewCount } from "@/lib/blogServer";
 import { Calendar, Eye, Clock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,6 +9,7 @@ import Image from "next/image";
 import BlockRenderer from "@/components/editor/BlockRenderer";
 import { blocksToPlainText, isTiptapJSON } from "@/components/editor/utils/migratePlainText";
 import ShareButtons from "@/components/ShareButtons";
+import ViewTracker from "@/components/ViewTracker";
 
 export const revalidate = 0;
 
@@ -107,6 +108,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       )
     : [];
 
+  const viewCount = await getPostViewCount(post.id);
+
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://simplicityblog.com";
   const postUrl = `${siteUrl}/blog/${post.slug}`;
@@ -136,6 +139,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <div className="min-h-screen bg-white">
+      <ViewTracker postId={post.id} />
       <Nav />
 
       <article className="max-w-3xl mx-auto px-4 py-12 max-[425px]:px-3 max-[425px]:py-8">
@@ -183,7 +187,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </span>
               <span className="flex items-center gap-2">
                 <Eye className="w-4 h-4 max-[425px]:w-3.5 max-[425px]:h-3.5" />
-                {(post.views || 0).toLocaleString()} views
+                {viewCount.toLocaleString()} views
               </span>
             </div>
             <ShareButtons url={postUrl} title={post.title} />

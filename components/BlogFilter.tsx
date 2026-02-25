@@ -184,7 +184,7 @@ export default function BlogFilter({ posts, tags }: BlogFilterProps) {
                     post={post}
                     index={index}
                     animationDelay={0.05}
-                    showViews={false}
+                    showViews={true}
                   />
                 ))}
               </motion.div>

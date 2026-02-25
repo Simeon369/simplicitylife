@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+  import { Loader2 } from "lucide-react";
 
 interface LoaderProps {
   /** Size: "xs" | "sm" | "md" | "lg". Default "md". */

@@ -6,6 +6,8 @@ import { Search, BookOpen } from "lucide-react";
 import Link from "next/link";
 import type { Tag } from "@/types";
 
+export const revalidate = 0;
+
 interface BlogPageProps {
   searchParams?: Promise<{
     tag?: string;

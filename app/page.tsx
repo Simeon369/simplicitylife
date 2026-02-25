@@ -5,6 +5,8 @@ import { blogAPI } from "@/services/api"
 import { ArrowRight, BookOpen, Feather } from "lucide-react"
 import Link from "next/link"
 
+export const revalidate = 0
+
 export default async function Home() {
   // Fetch recent posts on server
   const recentPostsResponse = await blogAPI.getRecentPosts(6)

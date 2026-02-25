@@ -10,6 +10,8 @@ import BlockRenderer from "@/components/editor/BlockRenderer";
 import { blocksToPlainText, isTiptapJSON } from "@/components/editor/utils/migratePlainText";
 import ShareButtons from "@/components/ShareButtons";
 
+export const revalidate = 0;
+
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
